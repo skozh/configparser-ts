@@ -9,6 +9,7 @@ class Config {
 
 class ConfigParser {
     private config: Config = {};
+    private configFile: string = '';
 
     read(configStr: string): void {
         const lines = configStr.split("\n");
@@ -39,6 +40,7 @@ class ConfigParser {
             try{
                 const configStr = fs.readFileSync(filePath, 'utf-8');
                 this.read(configStr);
+                this.configFile = filePath;
             } catch(err){
                 throw new Error(`Error reading file ${filePath} - ${err}`);
             }
@@ -48,8 +50,9 @@ class ConfigParser {
                 try{
                     const configStr = fs.readFileSync(defaultFilePath, 'utf-8');
                     this.read(configStr);
+                    this.configFile = defaultFilePath;
                 } catch(err){
-                    throw new Error(`Error reading file ${filePath} - ${err}`);
+                    throw new Error(`Error reading file ${defaultFilePath} - ${err}`);
                 }
             } else {
                 throw new Error("No main.config File Found!");
@@ -79,6 +82,29 @@ class ConfigParser {
             }
         }
         return configStr;
+    }
+
+    write(filePath?: string): void {
+        if (!filePath && !this.configFile){
+            throw new Error("No config file provided.")
+        }
+        else if(filePath){
+            try{
+                fs.writeFileSync(filePath, this.toString(), 'utf-8');
+            }
+            catch(err){
+                throw new Error(`Cannot write to the config file ${filePath} - ${err}`);
+            }
+        }
+        else if(this.configFile){
+            try{
+                fs.writeFileSync(this.configFile, this.toString(), 'utf-8');
+            }
+            catch(err){
+                throw new Error(`Cannot write to the config file ${this.configFile} - ${err}`);
+            }
+        }
+
     }
 }
 
