@@ -40,6 +40,7 @@ class Config {
 class ConfigParser {
     constructor() {
         this.config = {};
+        this.configFile = '';
     }
     read(configStr) {
         const lines = configStr.split("\n");
@@ -62,29 +63,17 @@ class ConfigParser {
         });
     }
     readFile(filePath) {
-        if (filePath) {
-            try {
-                const configStr = fs.readFileSync(filePath, 'utf-8');
-                this.read(configStr);
+        try {
+            const configFilePath = filePath || path.join(process.cwd(), 'main.config');
+            if (!fs.existsSync(configFilePath)) {
+                throw new Error('File not found');
             }
-            catch (err) {
-                throw new Error(`Error reading file ${filePath} - ${err}`);
-            }
+            const configStr = fs.readFileSync(configFilePath, 'utf-8');
+            this.read(configStr);
+            this.configFile = configFilePath;
         }
-        else {
-            const defaultFilePath = path.join(process.cwd(), 'main.config');
-            if (fs.existsSync(defaultFilePath)) {
-                try {
-                    const configStr = fs.readFileSync(defaultFilePath, 'utf-8');
-                    this.read(configStr);
-                }
-                catch (err) {
-                    throw new Error(`Error reading file ${filePath} - ${err}`);
-                }
-            }
-            else {
-                throw new Error("No main.config File Found!");
-            }
+        catch (err) {
+            throw new Error(`Error reading file: ${err instanceof Error ? err.message : err}`);
         }
     }
     get(section, key) {
@@ -106,6 +95,18 @@ class ConfigParser {
             }
         }
         return configStr;
+    }
+    write(filePath) {
+        try {
+            const configFilePath = filePath || this.configFile;
+            if (!configFilePath) {
+                throw new Error('No config file provided');
+            }
+            fs.writeFileSync(configFilePath, this.toString(), 'utf-8');
+        }
+        catch (err) {
+            throw new Error(`Error writing file: ${err instanceof Error ? err.message : err}`);
+        }
     }
 }
 exports.default = ConfigParser;

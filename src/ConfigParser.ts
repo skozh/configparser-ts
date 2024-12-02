@@ -35,28 +35,17 @@ class ConfigParser {
         });
     }
 
-    readFile(filePath?: string): void {
-        if (filePath) {
-            try{
-                const configStr = fs.readFileSync(filePath, 'utf-8');
-                this.read(configStr);
-                this.configFile = filePath;
-            } catch(err){
-                throw new Error(`Error reading file ${filePath} - ${err}`);
-            }
-        } else {
-            const defaultFilePath = path.join(process.cwd(), 'main.config');
-            if (fs.existsSync(defaultFilePath)) {
-                try{
-                    const configStr = fs.readFileSync(defaultFilePath, 'utf-8');
-                    this.read(configStr);
-                    this.configFile = defaultFilePath;
-                } catch(err){
-                    throw new Error(`Error reading file ${defaultFilePath} - ${err}`);
-                }
-            } else {
-                throw new Error("No main.config File Found!");
-            }
+    readFile(filePath?: string): void { 
+        try { 
+            const configFilePath = filePath || path.join(process.cwd(), 'main.config'); 
+            if (!fs.existsSync(configFilePath)) { 
+                throw new Error('File not found') 
+            } 
+            const configStr = fs.readFileSync(configFilePath, 'utf-8'); 
+            this.read(configStr); 
+            this.configFile = configFilePath; 
+        } catch (err) { 
+            throw new Error(`Error reading file: ${err instanceof Error ? err.message : err}`); 
         }
     }
 
@@ -76,7 +65,6 @@ class ConfigParser {
         let configStr = '';
         for (const section in this.config) {
             configStr += `[${section}]\n`;
-
             for (const key in this.config[section]) {
                 configStr += `${key}=${this.config[section][key]}\n`;
             }
@@ -84,27 +72,15 @@ class ConfigParser {
         return configStr;
     }
 
-    write(filePath?: string): void {
-        if (!filePath && !this.configFile){
-            throw new Error("No config file provided.")
+    write(filePath?: string): void { 
+        try { const configFilePath = filePath || this.configFile; 
+            if (!configFilePath) { 
+                throw new Error('No config file provided');  
+            } 
+            fs.writeFileSync(configFilePath, this.toString(), 'utf-8'); 
+        } catch (err) { 
+            throw new Error(`Error writing file: ${err instanceof Error ? err.message : err}`); 
         }
-        else if(filePath){
-            try{
-                fs.writeFileSync(filePath, this.toString(), 'utf-8');
-            }
-            catch(err){
-                throw new Error(`Cannot write to the config file ${filePath} - ${err}`);
-            }
-        }
-        else if(this.configFile){
-            try{
-                fs.writeFileSync(this.configFile, this.toString(), 'utf-8');
-            }
-            catch(err){
-                throw new Error(`Cannot write to the config file ${this.configFile} - ${err}`);
-            }
-        }
-
     }
 }
 

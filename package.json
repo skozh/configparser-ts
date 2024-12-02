@@ -2,16 +2,21 @@
   "name": "configparser-ts",
   "version": "1.0.0",
   "description": "A TypeScript library for parsing configuration files",
-  "main": "src/ConfigParser.js",
+  "main": "dist/ConfigParser.js",
+  "types": "dist/ConfigParser.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "cd test && npx ts-node ConfigParser.test.ts"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/skozh/configparser-ts.git"
+    "url": "git+https://github.com/skozh/configparser-ts.git"
   },
-  "keywords": ["config", "parser", "typescript"],
+  "keywords": [
+    "config",
+    "parser",
+    "typescript"
+  ],
   "author": "SK",
   "license": "MIT",
   "devDependencies": {
