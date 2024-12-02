@@ -1,6 +1,6 @@
 {
   "name": "configparser-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A TypeScript library for parsing configuration files",
   "main": "dist/ConfigParser.js",
   "types": "dist/ConfigParser.d.ts",
